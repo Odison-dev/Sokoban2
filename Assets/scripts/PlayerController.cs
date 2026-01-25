@@ -11,7 +11,8 @@ public class PlayerController : MonoBehaviour
     public PlayerControl IptControl;
 
     public bool isMoving = false;
-    //public bool canMove = true;
+    public bool moveable = true;
+    public GameObject Level;
 
     public float walkSpeed = 10f;
     public Vector3 dir;
@@ -19,10 +20,12 @@ public class PlayerController : MonoBehaviour
     private Vector3 posOffset2;
     private Vector3 targetPos;
     public LayerMask Colliderable;
+    private RunLevel runLevel;
     private void Awake()
     {
+        runLevel = Level.GetComponent<RunLevel>();
         IptControl = new PlayerControl();
-
+        //isMoving = Level.GetComponent<RunLevel>().isMoving;
         posOffset2 = new Vector3(Mathf.Round(transform.position.x) - transform.position.x, Mathf.Round(transform.position.y) - transform.position.y, 0);
         transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), 0) + posOffset;
     }
@@ -43,20 +46,26 @@ public class PlayerController : MonoBehaviour
         IptControl.Player.Move.canceled -= OnMoveInputCancled;
     }
 
+
+    //碰撞检测
+    
+
+
+
     private void OnMoveInputStarted(InputAction.CallbackContext context)
     {
         // 只有不在移动中时才接收新的输入
-        if (!isMoving)
+        if (!runLevel.isMoving)
         {
             Vector2 ipt = context.ReadValue<Vector2>();
             dir = new Vector3(ipt.x, ipt.y, 0);
 
             // 方向不为零时开始移动
-            if (dir != Vector3.zero && canMove(dir))
+            if (dir != Vector3.zero && canMove(transform.position - posOffset, dir))
+            //if (dir != Vector3.zero && moveable)
             {
-                isMoving = true;
+                runLevel.isMoving = true;
                 targetPos = transform.position + dir;
-                
             }
         }
     }
@@ -64,7 +73,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Mathf.Approximately(transform.position.x - posOffset.x, Mathf.Round(transform.position.x - posOffset.x)) && Mathf.Approximately(transform.position.y - posOffset.y, Mathf.Round(transform.position.y - posOffset.y)))
         {
-            isMoving = false;
+            runLevel.isMoving = false;
         }
     }
 
@@ -75,7 +84,7 @@ public class PlayerController : MonoBehaviour
         Vector2 ipt = IptControl.Player.Move.ReadValue<Vector2>();
         dir = new Vector3(ipt.x, ipt.y, 0);
 
-        if (isMoving)
+        if (runLevel.isMoving)
         {
             Move(dir);
             
@@ -84,15 +93,11 @@ public class PlayerController : MonoBehaviour
             {
                 // 确保精确到达目标位置
                 transform.position = targetPos;
-                isMoving = false;
+                runLevel.isMoving = false;
             }
         }
 
-        else
-        {
-            //CheckPush(dir);
-            ReleaseBoxes();
-        }
+        
 
     }
 
@@ -102,18 +107,7 @@ public class PlayerController : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, targetPos, walkSpeed * Time.deltaTime);
     }
 
-    private void CheckPush(Vector3 direction)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1f, Colliderable);
-        if (hit)
-        {
-            if (hit.transform.CompareTag("Pushable"))
-            {
-                hit.transform.SetParent(transform, true);
-            }
-        }
-
-    }
+    
     
     //临时方法
     private void ReleaseBoxes()
@@ -125,13 +119,11 @@ public class PlayerController : MonoBehaviour
     }
 
     //检测玩家能否移动
-    bool canMove(Vector3 direction)
+    bool canMove(Vector3 position, Vector3 direction)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1f, Colliderable);
+        Collider2D hit = Physics2D.OverlapBox(position + direction, .9f * Vector3.one,  0f, Colliderable);
         if (hit)
         {
-            
-            
             
             if (hit.transform.CompareTag("Wall"))
             {
@@ -141,8 +133,7 @@ public class PlayerController : MonoBehaviour
             {
 
                 hit.transform.SetParent(transform, true);
-
-                return true;
+                return canMove(position + direction, direction);
             }
             else
             {
