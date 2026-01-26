@@ -6,6 +6,12 @@ using System.Linq;
 
 public class RunLevel : MonoBehaviour
 {
+
+    /*
+    每一个可放置的游戏对象（兔子、箱子、还有终点的王冠）都有一个位移修正posOffset，编辑关卡时只需要把游戏对象拖到大致位置即可，脚本会自动对齐
+ */
+
+
     private List<Transform> Boxes = new List<Transform>();
     private List<Transform> CheckPoints = new List<Transform>();
 
@@ -21,7 +27,15 @@ public class RunLevel : MonoBehaviour
     }
     private void Update()
     {
-        
+        /*
+            在isMoving为true时，进行移动（如果要插入音效就在这个状态）
+            反之在isMoving为false时，游戏会结算状态（比如解除箱子与玩家的联系，判断是否通关等）
+            TODO: 也许可以加一些结算时的新机制
+         
+         
+         */
+
+
         if (isMoving)
         {
 
@@ -32,13 +46,14 @@ public class RunLevel : MonoBehaviour
             ReleaseBoxes();
             if (isAllBoxesOnCheckPoints())
             {
-                //TODO: 关卡完成
+                //TODO: 关卡完成方法
                 //LevelComplete()
                 print("Level Complete!");
             }
         }
     }
 
+    //对游戏对象归类
     private void Listing(string tag)
     {
         GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(tag);

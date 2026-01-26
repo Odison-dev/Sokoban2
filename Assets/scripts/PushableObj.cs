@@ -12,7 +12,6 @@ public class PushableObj : MonoBehaviour
         transform.position = new Vector3 (Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
     }
 
-    // Update is called once per frame
     private void Update()
     {
     }

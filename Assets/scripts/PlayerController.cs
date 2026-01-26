@@ -25,7 +25,6 @@ public class PlayerController : MonoBehaviour
     {
         runLevel = Level.GetComponent<RunLevel>();
         IptControl = new PlayerControl();
-        //isMoving = Level.GetComponent<RunLevel>().isMoving;
         posOffset2 = new Vector3(Mathf.Round(transform.position.x) - transform.position.x, Mathf.Round(transform.position.y) - transform.position.y, 0);
         transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), 0) + posOffset;
     }
@@ -35,7 +34,7 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         IptControl.Enable();
-        IptControl.Player.Move.started += OnMoveInputStarted;
+        IptControl.Player.Move.started += OnMoveInputStarted; 
         IptControl.Player.Move.canceled += OnMoveInputCancled;
     }
 
@@ -47,14 +46,13 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    //碰撞检测
     
 
 
 
     private void OnMoveInputStarted(InputAction.CallbackContext context)
     {
-        // 只有不在移动中时才接收新的输入
+        // 只有不在移动中时才接收新的方向输入
         if (!runLevel.isMoving)
         {
             Vector2 ipt = context.ReadValue<Vector2>();
@@ -62,7 +60,6 @@ public class PlayerController : MonoBehaviour
 
             // 方向不为零时开始移动
             if (dir != Vector3.zero && canMove(transform.position - posOffset, dir))
-            //if (dir != Vector3.zero && moveable)
             {
                 runLevel.isMoving = true;
                 targetPos = transform.position + dir;
@@ -77,7 +74,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     private void Update()
     {
 
@@ -109,14 +105,6 @@ public class PlayerController : MonoBehaviour
 
     
     
-    //临时方法
-    private void ReleaseBoxes()
-    {
-        foreach(Transform child in this.transform)
-        {
-            child.SetParent(null, true);
-        }
-    }
 
     //检测玩家能否移动
     bool canMove(Vector3 position, Vector3 direction)

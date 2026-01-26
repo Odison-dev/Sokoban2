@@ -14,18 +14,5 @@ public class CheckPoint : MonoBehaviour
     {
         transform.position = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z) + posOffset;
     }
-
-    //public void Check()
-    //{
-    //    Collider2D hit = Physics2D.OverlapBox(transform.position + posOffset, .5f * Vector3.one, 0f, Colliderable);
-    //    if (hit .transform.CompareTag("Pushable"))
-    //    {
-    //        boxOnTop = true;
-    //    }
-    //    else
-    //    {
-    //        boxOnTop = false;
-    //    }
-    //}
     
 }
